@@ -28,8 +28,4 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
         p.addLast(new HttpServerHandler());
     }
 
-    public static void main( String[] args ) {
-
-        System.out.println( "Hello World!" );
-    }
 }
