@@ -28,27 +28,25 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
             p.addLast(sslCtx.newHandler(ch.alloc()));
         }
 
-        // This is used on HttpHelloWorldServer
-        p.addLast(new HttpServerCodec());
-        // This is used on HttpSnoopServer
-        //p.addLast(new HttpRequestDecoder());
-        //p.addLast(new HttpResponseEncoder());
-
         // Uncomment the following line if you want automatic content compression.
         //p.addLast(new HttpContentCompressor());
 
         switch(0) {
             case 0:
+                p.addLast(new HttpServerCodec());
                 // If you don't want to handle HttpChunks.
                 p.addLast(new HttpObjectAggregator(1048576));
                 p.addLast(new HttpRecommendationServerHandler());
                 break;
 
             case 1:
+                p.addLast(new HttpRequestDecoder());
+                p.addLast(new HttpResponseEncoder());
                 p.addLast(new HttpSnoopServerHandler());
                 break;
 
             case 2:
+                p.addLast(new HttpServerCodec());
                 p.addLast(new HttpHelloWorldServerHandler());
                 break;
         }

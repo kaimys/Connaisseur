@@ -12,9 +12,11 @@ the [MovieLens website](http://grouplens.org/datasets/movielens/).
 
     # mvn clean compile assembly:single
 
-## Run
+## Run REST service
  
     # java -jar target/Recommender-jar-with-dependencies.jar
+    or
+    # java -cp target/Recommender-jar-with-dependencies.jar de.eightnine.rec.Recommender server
     Sep 02, 2014 5:13:24 PM io.netty.handler.logging.LoggingHandler channelRegistered
     Information: [id: 0x9ead90e3] REGISTERED
     Sep 02, 2014 5:13:24 PM io.netty.handler.logging.LoggingHandler bind
@@ -22,5 +24,8 @@ the [MovieLens website](http://grouplens.org/datasets/movielens/).
     Open your web browser and navigate to http://127.0.0.1:8080/
     Sep 02, 2014 5:13:24 PM io.netty.handler.logging.LoggingHandler channelActive
     Information: [id: 0x9ead90e3, /0:0:0:0:0:0:0:0:8080] ACTIVE
- 
+
+## Run converter
+
+    java -cp target/Recommender-jar-with-dependencies.jar de.eightnine.rec.Recommender convert
  

@@ -20,6 +20,10 @@ public class HttpServer {
     static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8443" : "8080"));
 
     public static void main(String[] args) throws Exception {
+        startServer();
+    }
+
+    public static void startServer() throws Exception {
         // Configure SSL.
         final SslContext sslCtx;
         if (SSL) {

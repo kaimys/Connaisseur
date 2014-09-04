@@ -2,3 +2,4 @@
 .idea
 recommender.iml
 target/
+data/movies.csv
