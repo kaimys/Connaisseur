@@ -11,9 +11,11 @@ public class Recommender {
                 HttpServer.startServer();
             } else if("convert".equals(args[0])) {
                 MovieLens.convert();
+            } else if("recommend".equals(args[0])) {
+                MovieLens.recommend();
             }
         } else {
-            System.out.println("usage: java de.eightnine.rec.Recommender [ server | convert ]");
+            System.out.println("usage: java de.eightnine.rec.Recommender [ server | convert | recommend ]");
         }
     }
 
