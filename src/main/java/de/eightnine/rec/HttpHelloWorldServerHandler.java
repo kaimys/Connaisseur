@@ -16,7 +16,7 @@ import static io.netty.handler.codec.http.HttpVersion.*;
 /**
  * Created by kai on 02.09.14.
  */
-public class HttpServerHandler extends ChannelInboundHandlerAdapter {
+public class HttpHelloWorldServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final byte[] CONTENT = { 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd' };
 
