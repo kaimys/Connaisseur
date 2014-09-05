@@ -38,7 +38,7 @@ public class MovieLens {
 
     }
 
-    public static void recommend() {
+    public static void recommend(int count) {
         try {
             DataModel dm = new FileDataModel(new File("data/movies.csv"));
 
@@ -56,7 +56,7 @@ public class MovieLens {
                     System.out.println(itemId + "," + recommendation.getItemID() + "," + recommendation.getValue());
                 }
                 x++;
-                if(x>10) System.exit(1);
+                if(x>count) System.exit(1);
             }
 
 
