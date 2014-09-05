@@ -18,6 +18,30 @@ import java.util.List;
  */
 public class MovieLens {
 
+    private DataModel model;
+    private ItemSimilarity similarity;
+    private GenericItemBasedRecommender recommender;
+
+    private static MovieLens movieLens;
+
+    private MovieLens() throws IOException {
+        this.model = new FileDataModel(new File("data/movies.csv"));
+        this.similarity = new LogLikelihoodSimilarity(this.model);
+        //TanimotoCoefficientSimilarity sim = new TanimotoCoefficientSimilarity(dm);
+        this.recommender = new GenericItemBasedRecommender(this.model, this.similarity);
+    }
+
+    public List<RecommendedItem> recommendSimilarItems(long itemId, int howMany) throws TasteException {
+        return recommender.mostSimilarItems(itemId, howMany);
+    }
+
+    public static MovieLens getInstance() throws IOException {
+        if(movieLens == null) {
+            movieLens = new MovieLens();
+        }
+        return movieLens;
+    }
+
     public static void main(String[] args) throws IOException {
         convert();
     }
@@ -40,17 +64,12 @@ public class MovieLens {
 
     public static void recommend(int count) {
         try {
-            DataModel dm = new FileDataModel(new File("data/movies.csv"));
-
-            ItemSimilarity sim = new LogLikelihoodSimilarity(dm);
-            //TanimotoCoefficientSimilarity sim = new TanimotoCoefficientSimilarity(dm);
-
-            GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(dm, sim);
+            MovieLens ml = MovieLens.getInstance();
 
             int x=1;
-            for(LongPrimitiveIterator items = dm.getItemIDs(); items.hasNext();) {
+            for(LongPrimitiveIterator items = ml.model.getItemIDs(); items.hasNext();) {
                 long itemId = items.nextLong();
-                List<RecommendedItem> recommendations = recommender.mostSimilarItems(itemId, 5);
+                List<RecommendedItem> recommendations = ml.recommendSimilarItems(itemId, 5);
 
                 for(RecommendedItem recommendation : recommendations) {
                     System.out.println(itemId + "," + recommendation.getItemID() + "," + recommendation.getValue());
@@ -58,8 +77,6 @@ public class MovieLens {
                 x++;
                 if(x>count) System.exit(1);
             }
-
-
 
         } catch (IOException e) {
             System.out.println("There was an error.");

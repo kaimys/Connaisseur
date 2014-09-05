@@ -20,10 +20,10 @@ public class HttpServer {
     static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8443" : "8080"));
 
     public static void main(String[] args) throws Exception {
-        startServer();
+        startServer(0);
     }
 
-    public static void startServer() throws Exception {
+    public static void startServer(int handler) throws Exception {
         // Configure SSL.
         final SslContext sslCtx;
         if (SSL) {
@@ -42,7 +42,7 @@ public class HttpServer {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new HttpServerInitializer(sslCtx));
+                    .childHandler(new HttpServerInitializer(sslCtx, handler));
 
             Channel ch = b.bind(PORT).sync().channel();
 

@@ -18,18 +18,18 @@ public class Recommender {
             System.arraycopy(args, 1, args2, 0, args.length-1);
 
             if("server".equals(cmd)) {
+                options.addOption("h", "handler", true, "Choose Netty channel handler");
                 options.addOption("s", "use-ssl", false, "Use SSL");
-                HttpServer.startServer();
+                CommandLine line = parser.parse(options, args2);
+                int handler = Integer.parseInt(line.getOptionValue("handler", "0"));
+                HttpServer.startServer(handler);
             } else if("convert".equals(cmd)) {
                 MovieLens.convert();
             } else if("recommend".equals(cmd)) {
                 options.addOption("r", "recommendations", true, "Number of recommendations");
                 try {
                     CommandLine line = parser.parse(options, args2);
-                    int recs = 10;
-                    if(line.hasOption("recommendations")) {
-                        recs = Integer.parseInt(line.getOptionValue("recommendations"));
-                    }
+                    int recs = Integer.parseInt(line.getOptionValue("recommendations", "10"));
                     MovieLens.recommend(recs);
                 } catch(ParseException ex) {
                     System.err.println(ex.getMessage() );
@@ -47,7 +47,7 @@ public class Recommender {
     }
 
     public static void usage() {
-        System.out.println("usage: java de.eightnine.rec.Recommender [ server | convert | recommend ]");
+        System.err.println("usage: java de.eightnine.rec.Recommender [ server | convert | recommend ]");
     }
 
 }
