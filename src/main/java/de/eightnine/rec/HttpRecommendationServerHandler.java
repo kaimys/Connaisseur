@@ -98,13 +98,17 @@ public class HttpRecommendationServerHandler extends SimpleChannelInboundHandler
 
             // Retrieve recommendations
             MovieLens ml = MovieLens.getInstance();
-            List<RecommendedItem> recs = ml.recommendSimilarItems(itemId, 5);
+            Movie m = ml.getMovieById(itemId);
             g.writeNumberField("itemId", itemId);
+            g.writeStringField("title", m.getTitle());
+            List<RecommendedItem> recs = ml.recommendSimilarItems(itemId, 5);
             g.writeArrayFieldStart("recommendations");
             for(RecommendedItem rec : recs) {
+                m = ml.getMovieById(rec.getItemID());
                 g.writeStartObject();
                 g.writeNumberField("id", rec.getItemID());
                 g.writeNumberField("weight", rec.getValue());
+                g.writeStringField("title", m.getTitle());
                 g.writeEndObject();
             }
             g.writeEndArray();
