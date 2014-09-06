@@ -10,6 +10,7 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.util.ReferenceCountUtil;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.slf4j.Logger;
@@ -67,7 +68,14 @@ public class HttpRecommendationServerHandler extends SimpleChannelInboundHandler
         } else if("user".equals(path[1]))  {
             writeResponseUserRec(req, g);
         } else {
-            g.writeStringField("result", "file not found");
+            g.close();
+            os.close();
+            logger.info("RefCnt=" + Integer.toString(req.refCnt()));
+            req.retain();
+            ctx.fireChannelRead(req);
+            //ReferenceCountUtil.release(req);
+            return;
+            //g.writeStringField("result", "file not found");
         }
 
         g.writeEndObject();
@@ -177,7 +185,6 @@ public class HttpRecommendationServerHandler extends SimpleChannelInboundHandler
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
         logger.error("Caught exception in channel handler", cause);
         ctx.close();
     }

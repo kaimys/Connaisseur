@@ -1,5 +1,6 @@
 package de.eightnine.rec;
 
+import io.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,14 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
                 logger.info("Starting HttpHelloWorldServerHandler...");
                 p.addLast(new HttpServerCodec());
                 p.addLast(new HttpHelloWorldServerHandler());
+                break;
+
+            case 3:
+                p.addLast(new HttpServerCodec());
+                p.addLast(new HttpObjectAggregator(1048576));
+                p.addLast(new HttpRecommendationServerHandler());
+                p.addLast(new ChunkedWriteHandler());
+                p.addLast(new HttpStaticFileServerHandler());
                 break;
 
             default:
