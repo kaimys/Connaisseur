@@ -8,7 +8,6 @@ import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
 import org.apache.mahout.cf.taste.impl.similarity.LogLikelihoodSimilarity;
 import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
-import org.apache.mahout.cf.taste.impl.similarity.TanimotoCoefficientSimilarity;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
@@ -17,12 +16,9 @@ import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 
 import java.io.*;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.text.SimpleDateFormat;
 
 /**
  * Created by kai on 04.09.14.
@@ -84,51 +80,32 @@ public class MovieLens {
 
     public static Map<Long, Movie> loadMovies(String filename) throws Exception {
         Map<Long, Movie> result = new HashMap<Long, Movie>();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "latin1"));
-        String line;
-        while ((line = br.readLine()) != null) {
-            String[] values = line.split("\\|", -1);
-            if (false) {
-                for (int i = 0; i < values.length; i++) {
-                    System.out.print(values[i] + ", ");
-                }
-                System.out.println();
-            }
+        CsvReader csv = new CsvReader(filename, "latin1");
+        while(csv.next()) {
+            //csv.printLine();
             Movie m = new Movie();
-            m.setId(Integer.parseInt(values[0]));
-            m.setTitle(values[1]);
-            if (!"".equals(values[2])) {
-                m.setReleaseDate(formatter.parse(values[2]));
-            }
-            m.setUrl(values[4]);
+            m.setId(csv.getInt(0));
+            m.setTitle(csv.getString(1));
+            m.setReleaseDate(csv.getDate(2));
+            m.setUrl(csv.getString(4));
             result.put(m.getId(), m);
         }
-        br.close();
         return result;
     }
 
     public static Map<Long, User> loadUser(String filename) throws Exception {
         Map<Long, User> result = new HashMap<Long, User>();
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "latin1"));
-        String line;
-        while ((line = br.readLine()) != null) {
-            String[] values = line.split("\\|", -1);
-            if (false) {
-                for (int i = 0; i < values.length; i++) {
-                    System.out.print(values[i] + ", ");
-                }
-                System.out.println();
-            }
+        CsvReader csv = new CsvReader(filename, "latin1");
+        while(csv.next()) {
+            //csv.printLine();
             User u = new User();
-            u.setId(Integer.parseInt(values[0]));
-            u.setAge(Integer.parseInt(values[1]));
-            u.setGender(values[2].charAt(0));
-            u.setOccupation(values[3]);
-            u.setZip(values[4]);
+            u.setId(csv.getInt(0));
+            u.setAge(csv.getInt(1));
+            u.setGender(csv.getChar(2));
+            u.setOccupation(csv.getString(3));
+            u.setZip(csv.getString(4));
             result.put(u.getId(), u);
         }
-        br.close();
         return result;
     }
 
