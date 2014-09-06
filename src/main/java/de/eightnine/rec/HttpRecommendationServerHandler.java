@@ -29,6 +29,7 @@ import static io.netty.handler.codec.http.HttpVersion.*;
 public class HttpRecommendationServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private static Logger logger = LoggerFactory.getLogger(HttpRecommendationServerHandler.class);
+    private String[] path;
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
@@ -56,7 +57,19 @@ public class HttpRecommendationServerHandler extends SimpleChannelInboundHandler
         g.writeStringField("host", HttpHeaders.getHost(req, "unknown"));
         g.writeEndObject();
         g.writeObjectFieldStart("response");
-        writeResponse(req, g);
+
+        // Routing
+        path = req.getUri().split("/");
+        if(path.length <= 1) {
+            g.writeStringField("result", "file not found");
+        } else if("items".equals(path[1]))  {
+            writeResponseItemRec(req, g);
+        } else if("user".equals(path[1]))  {
+            writeResponseUserRec(req, g);
+        } else {
+            g.writeStringField("result", "file not found");
+        }
+
         g.writeEndObject();
         g.writeEndObject();
         g.close();
@@ -82,25 +95,63 @@ public class HttpRecommendationServerHandler extends SimpleChannelInboundHandler
         }
     }
 
-    protected void writeResponse(FullHttpRequest req, JsonGenerator g) {
+    private void writeResponseUserRec(FullHttpRequest req, JsonGenerator g) {
         try {
-            // Routing
-            String[] path = req.getUri().split("/");
+            if (path.length != 3) {
+                g.writeStringField("result", "error");
+                return;
+            }
+            int userId = Integer.parseInt(path[2]);
+            // Retrieve recommendations
+            MovieLens ml = MovieLens.getInstance();
+            User u = ml.getUserById(userId);
+            if(u == null) {
+                g.writeStringField("result", "user not found");
+                return;
+            }
+            g.writeNumberField("id", userId);
+            g.writeStringField("zip", u.getZip());
+            g.writeNumberField("age", u.getAge());
+            g.writeStringField("gender", Character.toString(u.getGender()));
+            g.writeStringField("occupation", u.getOccupation());
+            g.writeStringField("result", "ok");
+            List<RecommendedItem> recs = ml.recommendItemsForUser(userId, 5);
+            g.writeArrayFieldStart("recommendations");
+            for(RecommendedItem rec : recs) {
+                Movie m = ml.getMovieById(rec.getItemID());
+                g.writeStartObject();
+                g.writeNumberField("id", rec.getItemID());
+                g.writeNumberField("weight", rec.getValue());
+                g.writeStringField("title", m.getTitle());
+                g.writeStringField("url", m.getUrl());
+                g.writeNumberField("releaseDate", m.getReleaseDate().getTime() / 1000);
+                g.writeEndObject();
+            }
+            g.writeEndArray();
+        } catch(Exception e) {
+            logger.error("Error retrieving user recommendations", e);
+        }
+    }
+
+    protected void writeResponseItemRec(FullHttpRequest req, JsonGenerator g) {
+        try {
             if(path.length != 3) {
                 g.writeStringField("result", "error");
                 return;
-            } else if(!"items".equals(path[1])) {
-                g.writeStringField("result", "file not found");
-                return;
             }
             int itemId = Integer.parseInt(path[2]);
-            g.writeStringField("result", "ok");
-
             // Retrieve recommendations
             MovieLens ml = MovieLens.getInstance();
             Movie m = ml.getMovieById(itemId);
-            g.writeNumberField("itemId", itemId);
+            if(m == null) {
+                g.writeStringField("result", "movie not found");
+                return;
+            }
+            g.writeStringField("result", "ok");
+            g.writeNumberField("id", itemId);
             g.writeStringField("title", m.getTitle());
+            g.writeStringField("url", m.getUrl());
+            g.writeNumberField("releaseDate", m.getReleaseDate().getTime() / 1000);
             List<RecommendedItem> recs = ml.recommendSimilarItems(itemId, 5);
             g.writeArrayFieldStart("recommendations");
             for(RecommendedItem rec : recs) {
@@ -109,15 +160,18 @@ public class HttpRecommendationServerHandler extends SimpleChannelInboundHandler
                 g.writeNumberField("id", rec.getItemID());
                 g.writeNumberField("weight", rec.getValue());
                 g.writeStringField("title", m.getTitle());
+                g.writeStringField("url", m.getUrl());
+                g.writeNumberField("releaseDate", m.getReleaseDate().getTime() / 1000);
                 g.writeEndObject();
             }
             g.writeEndArray();
-        } catch (NumberFormatException e) {
-            logger.error("Error retrieving recommendations", e);
-        } catch (IOException e) {
-            logger.error("Error retrieving recommendations", e);
-        } catch (TasteException e) {
-            logger.error("Error retrieving recommendations", e);
+        } catch (Exception e) {
+            try {
+                g.writeStringField("result", e.getMessage());
+            } catch (IOException e1) {
+                logger.error("Could not return error as JSON", e1);
+            }
+            logger.error("Error retrieving item recommendations", e);
         }
     }
 

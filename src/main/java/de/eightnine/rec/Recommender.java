@@ -22,15 +22,29 @@ public class Recommender {
                 options.addOption("s", "use-ssl", false, "Use SSL");
                 CommandLine line = parser.parse(options, args2);
                 int handler = Integer.parseInt(line.getOptionValue("handler", "0"));
+                MovieLens.getInstance();
                 HttpServer.startServer(handler);
             } else if("convert".equals(cmd)) {
                 MovieLens.convert();
-            } else if("recommend".equals(cmd)) {
+            } else if("itemrec".equals(cmd)) {
                 options.addOption("r", "recommendations", true, "Number of recommendations");
                 try {
                     CommandLine line = parser.parse(options, args2);
                     int recs = Integer.parseInt(line.getOptionValue("recommendations", "10"));
                     MovieLens.recommend(recs);
+                } catch(ParseException ex) {
+                    System.err.println(ex.getMessage() );
+                    usage();
+                } catch(NumberFormatException ex) {
+                    System.err.println("Invalid number format: " + ex.getMessage() );
+                    usage();
+                }
+            } else if("userrec".equals(cmd)) {
+                options.addOption("r", "recommendations", true, "Number of recommendations");
+                try {
+                    CommandLine line = parser.parse(options, args2);
+                    int recs = Integer.parseInt(line.getOptionValue("recommendations", "10"));
+                    MovieLens.recommendUser(recs);
                 } catch(ParseException ex) {
                     System.err.println(ex.getMessage() );
                     usage();
@@ -47,7 +61,7 @@ public class Recommender {
     }
 
     public static void usage() {
-        System.err.println("usage: java de.eightnine.rec.Recommender [ server | convert | recommend ]");
+        System.err.println("usage: java de.eightnine.rec.Recommender [ server | convert | itemrec | userrec ]");
     }
 
 }
