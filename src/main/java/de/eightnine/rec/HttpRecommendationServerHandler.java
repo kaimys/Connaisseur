@@ -164,6 +164,7 @@ public class HttpRecommendationServerHandler extends SimpleChannelInboundHandler
             while(i.hasNext()) {
                 Movie m = i.next();
                 g.writeStartObject();
+                g.writeNumberField("id", m.getId());
                 g.writeStringField("title", m.getTitle());
                 g.writeStringField("url", m.getUrl());
                 g.writeNumberField("releaseDate", m.getReleaseDate().getTime() / 1000);
