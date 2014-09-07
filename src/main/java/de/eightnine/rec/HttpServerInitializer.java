@@ -43,9 +43,10 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
             case 0:
                 logger.info("Starting HttpRecommendationServerHandler...");
                 p.addLast(new HttpServerCodec());
-                // If you don't want to handle HttpChunks.
                 p.addLast(new HttpObjectAggregator(1048576));
                 p.addLast(new HttpRecommendationServerHandler());
+                p.addLast(new ChunkedWriteHandler());
+                p.addLast(new HttpStaticFileServerHandler());
                 break;
 
             case 1:
@@ -59,14 +60,6 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
                 logger.info("Starting HttpHelloWorldServerHandler...");
                 p.addLast(new HttpServerCodec());
                 p.addLast(new HttpHelloWorldServerHandler());
-                break;
-
-            case 3:
-                p.addLast(new HttpServerCodec());
-                p.addLast(new HttpObjectAggregator(1048576));
-                p.addLast(new HttpRecommendationServerHandler());
-                p.addLast(new ChunkedWriteHandler());
-                p.addLast(new HttpStaticFileServerHandler());
                 break;
 
             default:

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.*;
@@ -65,6 +66,8 @@ public class HttpRecommendationServerHandler extends SimpleChannelInboundHandler
             g.writeStringField("result", "file not found");
         } else if("items".equals(path[1]))  {
             writeResponseItemRec(req, g);
+        } else if("itemSearch".equals(path[1]))  {
+            writeResponseItemSearch(req, g);
         } else if("user".equals(path[1]))  {
             writeResponseUserRec(req, g);
         } else {
@@ -138,6 +141,42 @@ public class HttpRecommendationServerHandler extends SimpleChannelInboundHandler
             g.writeEndArray();
         } catch(Exception e) {
             logger.error("Error retrieving user recommendations", e);
+        }
+    }
+
+    private void writeResponseItemSearch(FullHttpRequest req, JsonGenerator g) {
+        try {
+            if(path.length != 3) {
+                g.writeStringField("result", "error");
+                return;
+            }
+            // Retrieve recommendations
+            MovieLens ml = MovieLens.getInstance();
+            List<Movie> movies = ml.searchMovies(path[2]);
+            if(movies.isEmpty()) {
+                g.writeStringField("result", "movie not found");
+                return;
+            }
+            g.writeStringField("result", "ok");
+            g.writeStringField("query", path[2]);
+            g.writeArrayFieldStart("searchResult");
+            Iterator<Movie> i = movies.iterator();
+            while(i.hasNext()) {
+                Movie m = i.next();
+                g.writeStartObject();
+                g.writeStringField("title", m.getTitle());
+                g.writeStringField("url", m.getUrl());
+                g.writeNumberField("releaseDate", m.getReleaseDate().getTime() / 1000);
+                g.writeEndObject();
+            }
+            g.writeEndArray();
+        } catch (Exception e) {
+            try {
+                g.writeStringField("result", e.getMessage());
+            } catch (IOException e1) {
+                logger.error("Could not return error as JSON", e1);
+            }
+            logger.error("Error retrieving item recommendations", e);
         }
     }
 
