@@ -16,5 +16,5 @@ just have to install Apache Maven to get started.
 - Run `mvn clean compile assembly:single` to build a JAR file with all dependencies
 - Convert the MovieLens data to CSV `./recsys convert`
 - Start the server `./recsys server`
-- Point your browser to [localhost:8080/](http://127.0.0.1:8080/) to start the API explorer.
+- Point your browser to [localhost:8080](http://127.0.0.1:8080/index.html) to start the API explorer.
 
