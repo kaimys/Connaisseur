@@ -1,0 +1,24 @@
+<h1>Movie Search</h1>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="input-group">
+            <input id="user-id" ng-model="query" type="text" class="form-control">
+                <span class="input-group-btn">
+                    <button id="go" class="btn btn-default" ng-click="search(query)" type="button">Search!</button>
+                </span>
+        </div><!-- /input-group -->
+    </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
+
+
+<p></p>
+<div id="search-result" class="panel panel-default" style="display: none">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Search result</div>
+
+    <!-- Table -->
+    <table class="table" id="results">
+        <tr ng-repeat="movie in movies"><td><a href="#/movies/{{movie.id}}">{{movie.id}}</a></td></td><td>{{movie.title}}</td><td><a target="_new" href="{{movie.url}}">{{movie.url}}</a></td></tr>
+    </table>
+</div>

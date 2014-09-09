@@ -1,0 +1,16 @@
+<h1>Movie Detail</h1>
+
+<p></p>
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Similar Items for {{movies.title}}</div>
+
+    <!-- Table -->
+    <table class="table" id="results">
+        <tr ng-repeat="movie in movies.recommendations">
+            <td><a href="#/movies/{{movie.id}}">{{movie.id}}</a></td></td>
+            <td>{{movie.weight}}</td>
+            <td>{{movie.title}}</td>
+            <td><a target="_new" href="{{movie.url}}">{{movie.url}}</a></td></tr>
+    </table>
+</div>
