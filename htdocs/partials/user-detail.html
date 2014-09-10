@@ -1,0 +1,21 @@
+<h1>User Detail</h1>
+
+<p></p>
+<ul class="pager">
+    <li class="previous"><a href="#/users/{{user.id - 1}}">&larr; Previous</a></li>
+    <li class="next"><a href="#/users/{{user.id + 1}}">Next &rarr;</a></li>
+</ul>
+
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Recommendations for {{user.id}} ({{user.age}}, {{user.gender}}, {{user.occupation}})</div>
+
+    <!-- Table -->
+    <table class="table" id="results">
+        <tr ng-repeat="movie in user.recommendations">
+            <td><a href="#/movies/{{movie.id}}">{{movie.id}}</a></td></td>
+            <td>{{movie.weight}}</td>
+            <td>{{movie.title}}</td>
+            <td><a target="_new" href="{{movie.url}}">{{movie.url}}</a></td></tr>
+    </table>
+</div>

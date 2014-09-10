@@ -17,6 +17,10 @@ connaisseur.config(['$routeProvider',
                 templateUrl: 'partials/movie-detail.html',
                 controller: 'MovieDetailCtrl'
             }).
+            when('/users/:userId', {
+                templateUrl: 'partials/user-detail.html',
+                controller: 'UserDetailCtrl'
+            }).
             otherwise({
                 redirectTo: '/movies'
             });
